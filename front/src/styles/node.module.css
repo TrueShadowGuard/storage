@@ -1,0 +1,28 @@
+.node {
+    position: relative;
+    padding-top: 5px;
+    padding-left: 15px;
+    user-select: none;
+}
+
+.nodeHeader {
+    height: 100%;
+    display: flex;
+    align-items: center;
+}
+
+.typeIcon {
+    height: 24px;
+    margin-right: 3px;
+}
+
+.arrow {
+    position: absolute;
+    left: 0px;
+    width: 10px;
+    cursor: pointer;
+}
+
+.selected > .nodeHeader{
+    background-color: rgba(0, 0, 0, 0.1);
+}
