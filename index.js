@@ -18,6 +18,7 @@ app.get("/structure", async (req, res) => {
 });
 
 /**
+ * body:
  * {
  *   type: "file" | "dir",
  *   name: "string"
@@ -48,19 +49,41 @@ app.post("/create", async (req, res) => {
 });
 
 /**
+ * body:
  * {
  *   path: array<string>
  * }
  */
-app.post("/delete", async (req,res) => {
+app.post("/delete-node", async (req,res) => {
   try {
-    const absolutePath = path.join(__dirname, "cloud", ...req.body.path);
-    await fs.unlink(absolutePath);
+    const absolutePath = req.body.path;
+    const stats = await fs.stat(absolutePath);
+    if(stats.isFile()){
+      await fs.unlink(absolutePath);
+    } else {
+      await fs.rmdir(absolutePath)
+    }
     res.status(200).end();
   } catch (e) {
     console.error(e);
     res.status(400).end();
   }
-})
+});
+
+/**
+ * query:
+ * {
+ *   path: array<string>
+ * }
+ */
+app.get("/download-node", async (req,res) => {
+  try {
+    const absolutePath = req.query.path;
+    res.download(absolutePath);
+  } catch (e) {
+    console.error(e);
+    res.status(400).end();
+  }
+});
 
 app.listen(port, () => console.log("listening on port " + port))

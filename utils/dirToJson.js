@@ -30,10 +30,15 @@ var dirToJson = function(dir, done) {
           });
         }
         else {
+          const fileInfo = {};
+          const stats = fs.statSync(file);
+          fileInfo.size = stats.size;
+          fileInfo.extension = stats.extname;
           results.push({
             type: 'file',
             path: file,
-            name: path.basename(file)
+            name: path.basename(file),
+            fileInfo
           });
           if (!--pending)
             done(null, results);

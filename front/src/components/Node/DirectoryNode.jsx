@@ -7,26 +7,26 @@ import Right from "../../images/arrow-right.png";
 import {useState} from "react";
 
 
-const DirectoryNode = ({name, children, onClick}) => {
+const DirectoryNode = ({name, children, onClick, onContextMenu}) => {
   const [childrenHidden, setChildrenHidden] = useState(true);
   const arrowImage = childrenHidden ? Right : Down;
   return (
     <>
-      <div className={s.nodeHeader} onClick={onClick} onDoubleClick={onDoubleClick}>
+      <div className={s.nodeHeader} onClick={onClick} onDoubleClick={onDoubleClick} onContextMenu={onContextMenu}>
         <img className={s.arrow} src={arrowImage} alt={"arrow down"} onClick={e => setChildrenHidden(!childrenHidden)}/>
         <img src={Folder} alt="folder image" className={s.typeIcon}/>
         <span>{name}</span>
       </div>
-      <div style={{marginLeft: "20px"}}>
+      <div style={{paddingLeft: "20px"}}>
         {!childrenHidden && children && children.map && children.map(child =>
-          <Node type={child.type} name={child.name} path={child.path} children={child.children}/>
+          <Node type={child.type} name={child.name} path={child.path} children={child.children} key={child.path}/>
         )}
       </div>
     </>
   );
 
   function onDoubleClick(e) {
-    setChildrenHidden(!childrenHidden);
+    setChildrenHidden(!childrenHidden)
   }
 };
 

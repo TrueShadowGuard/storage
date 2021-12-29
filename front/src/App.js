@@ -1,8 +1,10 @@
 import getFileStructure from "./network/getFileStructure";
 import {useEffect, useState, useCallback, createContext} from "react";
 import FileStructure from "./components/FileStructure";
+import TitleBar from "./components/TitleBar/TitleBar";
 
 export const SelectedNodesContext = createContext({});
+export const FileStructureContext = createContext(null);
 
 function App() {
 
@@ -10,16 +12,19 @@ function App() {
 
   const updateFileStructure = useCallback(() => {
     getFileStructure().then(setFileStructure);
-  }, [])
+  }, []);
 
   useEffect(updateFileStructure, []);
 
   const [selectedNodes, setSelectedNodes] = useState([]);
 
   return (
-    <SelectedNodesContext.Provider value={{selectedNodes, setSelectedNodes}}>
-      <FileStructure fileStructure={fileStructure}/>
-    </SelectedNodesContext.Provider>
+    <FileStructureContext.Provider value={{updateFileStructure}}>
+      <SelectedNodesContext.Provider value={{selectedNodes, setSelectedNodes}}>
+        <TitleBar/>
+        <FileStructure fileStructure={fileStructure}/>
+      </SelectedNodesContext.Provider>
+    </FileStructureContext.Provider>
   );
 }
 

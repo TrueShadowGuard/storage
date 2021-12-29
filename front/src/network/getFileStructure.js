@@ -1,5 +1,11 @@
-import axios from 'axios';
+import axios from './axios';
 
 export default async function getFileStructure() {
-  return (await axios.get("/structure")).data;
+  try {
+    const response = await axios.get("/structure")
+    return response.data;
+  } catch (e) {
+    console.error(e);
+    return null;
+  }
 }
