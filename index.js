@@ -51,12 +51,12 @@ app.post("/create", async (req, res) => {
 /**
  * body:
  * {
- *   path: array<string>
+ *   path: string
  * }
  */
 app.post("/delete-node", async (req,res) => {
   try {
-    const absolutePath = req.body.path;
+    const absolutePath = path.join(__dirname, req.body.path);
     const stats = await fs.stat(absolutePath);
     if(stats.isFile()){
       await fs.unlink(absolutePath);
@@ -73,12 +73,12 @@ app.post("/delete-node", async (req,res) => {
 /**
  * query:
  * {
- *   path: array<string>
+ *   path: string
  * }
  */
 app.get("/download-node", async (req,res) => {
   try {
-    const absolutePath = req.query.path;
+    const absolutePath = path.join(__dirname, req.query.path);
     res.download(absolutePath);
   } catch (e) {
     console.error(e);

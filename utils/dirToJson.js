@@ -2,41 +2,45 @@ var fs = require('fs');
 var path = require('path');
 var {promisify} = require('util');
 
-var dirToJson = function(dir, done) {
+var dirToJson = function (dir, done) {
   var results = [];
 
-  fs.readdir(dir, function(err, list) {
+  fs.readdir(dir, function (err, list) {
     if (err)
       return done(err);
 
     var pending = list.length;
 
     if (!pending)
-      return done(null, {name: path.basename(dir), type: 'folder', children: results});
+      return done(null, {
+        name: path.basename(dir),
+        type: 'folder',
+        children: results,
+        path: getPath(dir),
+      });
 
-    list.forEach(function(file) {
+    list.forEach(function (file) {
       file = path.resolve(dir, file);
-      fs.stat(file, function(err, stat) {
+      fs.stat(file, function (err, stat) {
         if (stat && stat.isDirectory()) {
-          dirToJson(file, function(err, res) {
+          dirToJson(file, function (err, res) {
             results.push({
               name: path.basename(file),
-              path: file,
+              path: getPath(file),
               type: 'folder',
               children: res
             });
             if (!--pending)
               done(null, results);
           });
-        }
-        else {
+        } else {
           const fileInfo = {};
           const stats = fs.statSync(file);
           fileInfo.size = stats.size;
           fileInfo.extension = stats.extname;
           results.push({
             type: 'file',
-            path: file,
+            path: getPath(file),
             name: path.basename(file),
             fileInfo
           });
@@ -49,3 +53,8 @@ var dirToJson = function(dir, done) {
 };
 
 module.exports = promisify(dirToJson);
+
+function getPath(absolutePath) {
+  const start = absolutePath.indexOf("cloud") + 6;
+  return absolutePath.slice(start);
+}
