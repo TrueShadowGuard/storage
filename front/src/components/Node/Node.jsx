@@ -9,6 +9,9 @@ import FileContextMenu from "./FileContextMenu";
 import DirectoryContextMenu from "./DirectoryContextMenu";
 import deleteNode from "../../network/deleteNode";
 import downloadNode from "../../network/downloadNode";
+import createFile from "../../network/createFile";
+import createFolder from "../../network/createFolder";
+import readAsBlob from "../../utils/readAsBlob";
 
 const Node = (props) => {
 
@@ -24,7 +27,7 @@ const Node = (props) => {
 
   const {show} = useContextMenu({
     id: path
-  })
+  });
 
   const className = getClassName(s, isSelected);
 
@@ -33,17 +36,27 @@ const Node = (props) => {
       {type === "file" ?
         <FileNode name={name}
                   onClick={handleNodeClick(path)}
-                  onContextMenu={show}
+                  onContextMenu={handleRightClick(path, show)}
         /> :
         <DirectoryNode name={name}
                        children={children}
                        onClick={handleNodeClick(path)}
-                       onContextMenu={show}
+                       onContextMenu={handleRightClick(path, show)}
         />
       }
       {type === "file" ?
-        <FileContextMenu id={path} onDeleteClick={handleDeleteClick(path)} onDownloadClick={handleDownloadClick(path)}/> :
-        <DirectoryContextMenu id={path} onDeleteClick={handleDeleteClick(path)} onDownloadClick={handleDownloadClick(path)}/>
+        <FileContextMenu id={path}
+                         onDeleteClick={handleDeleteClick(path)}
+                         onDownloadClick={handleDownloadClick(path)}
+                         onCreateFileClick={handleCreateFileClick(path)}
+                         onCreateFolderClick={handleCreateFolderClick(path)}
+        /> :
+        <DirectoryContextMenu id={path}
+                              onDeleteClick={handleDeleteClick(path)}
+                              onDownloadClick={handleDownloadClick(path)}
+                              onCreateFileClick={handleCreateFileClick(path)}
+                              onCreateFolderClick={handleCreateFolderClick(path)}
+        />
       }
     </div>
   );
@@ -51,7 +64,6 @@ const Node = (props) => {
   function handleNodeClick(path) {
     return function (e) {
       setSelectedNodes({[path]: true});
-      console.log('click node', e)
     }
   }
 
@@ -65,6 +77,34 @@ const Node = (props) => {
   function handleDownloadClick(path) {
     return function (e) {
       downloadNode(path);
+    }
+  }
+
+  function handleCreateFileClick(path) {
+    return () => {
+      const inp = document.createElement('input');
+      inp.type = "file";
+      inp.click();
+      inp.onchange = async e => {
+        const file = e.target.files[0];
+        console.log('file', file);
+        const ok = await createFile(path, file, file.name);
+        if(ok) updateFileStructure();
+      }
+    }
+  }
+
+  function handleCreateFolderClick(path) {
+    return async function (e) {
+      const ok = await createFolder(path);
+      if(ok) updateFileStructure();
+    }
+  }
+
+  function handleRightClick(path, show) {
+    return function (e) {
+      show(e);
+      setSelectedNodes({[path]: true});
     }
   }
 };

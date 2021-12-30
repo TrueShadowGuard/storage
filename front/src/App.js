@@ -3,6 +3,8 @@ import {useEffect, useState, useCallback, createContext} from "react";
 import FileStructure from "./components/FileStructure";
 import TitleBar from "./components/TitleBar/TitleBar";
 
+import "./styles/main.css"
+
 export const SelectedNodesContext = createContext({});
 export const FileStructureContext = createContext(null);
 

@@ -55,6 +55,6 @@ var dirToJson = function (dir, done) {
 module.exports = promisify(dirToJson);
 
 function getPath(absolutePath) {
-  const start = absolutePath.indexOf("cloud") + 6;
+  const start = absolutePath.lastIndexOf("cloud") + 6;
   return absolutePath.slice(start);
 }
