@@ -26,6 +26,7 @@
     "express": "^4.17.2",
     "express-formidable": "^1.2.0",
     "express-zip": "^3.0.0",
-    "multer": "^1.4.4"
+    "multer": "^1.4.4",
+    "zip-a-folder": "^1.1.0"
   }
 }

@@ -3,15 +3,16 @@ import DirectoryNode from "./DirectoryNode";
 import FileNode from "./FileNode";
 import s from "../../styles/node.module.css";
 import {FileStructureContext, SelectedNodesContext} from "../../App";
-import {Item, Menu, useContextMenu, Separator} from "react-contexify";
-import 'react-contexify/dist/ReactContexify.css';
-import FileContextMenu from "./FileContextMenu";
-import DirectoryContextMenu from "./DirectoryContextMenu";
+import {useContextMenu} from "react-contexify";
 import deleteNode from "../../network/deleteNode";
 import downloadNode from "../../network/downloadNode";
 import createFile from "../../network/createFile";
 import createFolder from "../../network/createFolder";
-import readAsBlob from "../../utils/readAsBlob";
+import readAsText from "../../utils/readAsText";
+import ContextMenu from "./ContextMenu";
+import renameNode from "../../network/renameNode";
+
+import 'react-contexify/dist/ReactContexify.css';
 
 const Node = (props) => {
 
@@ -31,6 +32,14 @@ const Node = (props) => {
 
   const className = getClassName(s, isSelected);
 
+  const contextMenuButtons = [
+    {action: handleDownloadClick(path), title: "Download"},
+    {action: handleCreateFileClick(path), title: "Create file"},
+    {action: handleCreateFolderClick(path), title: "Create folder"},
+    {action: handleDeleteClick(path), title: "Delete"},
+    {action: handleRenameClick(path), title: "Rename"},
+  ]
+
   return (
     <div className={className}>
       {type === "file" ?
@@ -44,20 +53,7 @@ const Node = (props) => {
                        onContextMenu={handleRightClick(path, show)}
         />
       }
-      {type === "file" ?
-        <FileContextMenu id={path}
-                         onDeleteClick={handleDeleteClick(path)}
-                         onDownloadClick={handleDownloadClick(path)}
-                         onCreateFileClick={handleCreateFileClick(path)}
-                         onCreateFolderClick={handleCreateFolderClick(path)}
-        /> :
-        <DirectoryContextMenu id={path}
-                              onDeleteClick={handleDeleteClick(path)}
-                              onDownloadClick={handleDownloadClick(path)}
-                              onCreateFileClick={handleCreateFileClick(path)}
-                              onCreateFolderClick={handleCreateFolderClick(path)}
-        />
-      }
+      <ContextMenu buttons={contextMenuButtons} id={path} />
     </div>
   );
 
@@ -70,7 +66,7 @@ const Node = (props) => {
   function handleDeleteClick(path) {
     return async function (e) {
       const ok = await deleteNode(path);
-      if(ok) updateFileStructure();
+      if (ok) updateFileStructure();
     }
   }
 
@@ -87,9 +83,9 @@ const Node = (props) => {
       inp.click();
       inp.onchange = async e => {
         const file = e.target.files[0];
-        console.log('file', file);
-        const ok = await createFile(path, file, file.name);
-        if(ok) updateFileStructure();
+        const text = await readAsText(file);
+        const ok = await createFile(path, text, file.name);
+        if (ok) updateFileStructure();
       }
     }
   }
@@ -97,7 +93,7 @@ const Node = (props) => {
   function handleCreateFolderClick(path) {
     return async function (e) {
       const ok = await createFolder(path);
-      if(ok) updateFileStructure();
+      if (ok) updateFileStructure();
     }
   }
 
@@ -106,6 +102,15 @@ const Node = (props) => {
       show(e);
       setSelectedNodes({[path]: true});
     }
+  }
+
+  function handleRenameClick(path) {
+     return async function (e) {
+       const name = window.prompt("Enter new file name");
+       if(name === null) return;
+       const ok = await renameNode(path, name);
+       if(ok) updateFileStructure();
+     }
   }
 };
 

@@ -5,6 +5,7 @@ import styled from "@emotion/styled";
 import {grey} from "@mui/material/colors";
 import createFolder from "../../network/createFolder";
 import {FileStructureContext} from "../../App";
+import downloadNode from "../../network/downloadNode";
 
 const TitleBarStyled = styled.div({
   padding: "5px",
@@ -23,7 +24,7 @@ const TitleBar = () => {
         </IconButton>
       </Tooltip>
       <Tooltip title="Download storage as zip">
-        <IconButton>
+        <IconButton onClick={() => downloadStorage()}>
           <DownloadRounded/>
         </IconButton>
       </Tooltip>
@@ -34,6 +35,10 @@ const TitleBar = () => {
 async function createTopLevelFolder(updateFileStructure) {
   const ok = await createFolder("");
   if(ok) updateFileStructure();
+}
+
+function downloadStorage() {
+  downloadNode(".");
 }
 
 export default TitleBar;

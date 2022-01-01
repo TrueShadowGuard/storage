@@ -19,7 +19,13 @@ const DirectoryNode = ({name, children, onClick, onContextMenu}) => {
       </div>
       <div style={{paddingLeft: "20px"}}>
         {!childrenHidden && children && children.map && children.map(child =>
-          <Node type={child.type} name={child.name} path={child.path} children={child.children} key={child.path}/>
+          <Node type={child.type}
+                name={child.name}
+                path={child.path}
+                children={child.children}
+                key={child.path}
+                parent={child}
+          />
         )}
       </div>
     </>
