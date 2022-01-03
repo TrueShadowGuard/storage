@@ -4,13 +4,14 @@ const dirToJson = require("../utils/dirToJson");
 const fs = require("fs").promises;
 const crudRouter = express();
 const zip = require("zip-a-folder");
+const authMiddleware = require("../middlewares/authMiddleware");
 
-const getCloudDir = () => dirToJson(path.join(__dirname, '..', "cloud"));
+const getCloudAsJSON = userId => dirToJson(path.join(__dirname, '..', "cloud", userId));
 const base64ToBuffer = base64 => Buffer.from(base64.split(',')[1], "base64");
-const cloudPath = path.join(__dirname, '..', "cloud");
+const getCloudPath = userId => path.join(__dirname, '..', 'cloud', String(userId));
 
-crudRouter.get("/structure", async (req, res) => {
-  res.json(await getCloudDir());
+crudRouter.get("/:userId/structure", authMiddleware, async (req, res) => {
+  res.json(await getCloudAsJSON(req.params.userId));
 });
 
 /**
@@ -21,17 +22,20 @@ crudRouter.get("/structure", async (req, res) => {
  *   file?: "string"
  * }
  */
-crudRouter.post("/create", async (req, res) => {
+crudRouter.post("/:userId/create", authMiddleware, async (req, res) => {
   try {
+    console.log('create', req.user.login, req.body)
     const type = req.body.type;
-    const name = req.body.name || (Math.random()*1000000000).toFixed(0);
-    if(type === "folder") {
+    const name = req.body.name || (Math.random() * 1000000000).toFixed(0);
+    const cloudPath = getCloudPath(req.params.userId)
+    if (type === "folder") {
       const absolutePath = path.join(cloudPath, req.body.path, name);
       await fs.mkdir(absolutePath);
       res.status(200).end();
-    } else if(type === "file") {
+    } else if (type === "file") {
       const buffer = base64ToBuffer(req.body.file);
       const absolutePath = path.join(cloudPath, req.body.path, name);
+      console.log(req.params.userId, cloudPath, absolutePath, req.body.path, name)
       await fs.writeFile(absolutePath, buffer);
       res.status(200).end();
     } else {
@@ -49,11 +53,12 @@ crudRouter.post("/create", async (req, res) => {
  *   path: string
  * }
  */
-crudRouter.post("/delete-node", async (req, res) => {
+crudRouter.post("/:userId/delete-node", authMiddleware, async (req, res) => {
   try {
+    const cloudPath = getCloudPath(req.params.userId)
     const absolutePath = path.join(cloudPath, req.body.path);
     const stats = await fs.stat(absolutePath);
-    if(stats.isFile()){
+    if (stats.isFile()) {
       await fs.unlink(absolutePath);
     } else {
       await fs.rmdir(absolutePath, {recursive: true});
@@ -70,11 +75,13 @@ crudRouter.post("/delete-node", async (req, res) => {
  *   path: string
  * }
  */
-crudRouter.get("/download-node", async (req, res) => {
+crudRouter.get("/:userId/download-node", async (req, res) => {
   try {
+    const cloudPath = getCloudPath(req.params.userId);
     const absolutePath = path.join(cloudPath, req.query.path);
     const isFile = (await fs.lstat(absolutePath)).isFile();
-    if(isFile) {
+    console.log('download', absolutePath)
+    if (isFile) {
       res.download(absolutePath);
     } else {
       res.setHeader("Content-Disposition", `attachment; filename=${path.basename(absolutePath)}.zip`);
@@ -86,10 +93,11 @@ crudRouter.get("/download-node", async (req, res) => {
   }
 });
 
-crudRouter.put("/rename-node", async (req, res) => {
+crudRouter.put("/:userId/rename-node", authMiddleware, async (req, res) => {
   try {
+    const cloudPath = getCloudPath(req.params.userId);
     const oldPath = path.join(cloudPath, req.body.path);
-    const newPath = path.join(cloudPath, req.body.path, '..',  req.body.name);
+    const newPath = path.join(cloudPath, req.body.path, '..', req.body.name);
     await fs.rename(oldPath, newPath);
     res.status(200).end();
   } catch (e) {

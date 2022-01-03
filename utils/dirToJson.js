@@ -10,14 +10,10 @@ var dirToJson = function (dir, done) {
       return done(err);
 
     var pending = list.length;
+    list.sort();
 
     if (!pending)
-      return done(null, {
-        name: path.basename(dir),
-        type: 'folder',
-        children: results,
-        path: getPath(dir),
-      });
+      return done(null, results);
 
     list.forEach(function (file) {
       file = path.resolve(dir, file);
@@ -55,6 +51,7 @@ var dirToJson = function (dir, done) {
 module.exports = promisify(dirToJson);
 
 function getPath(absolutePath) {
-  const start = absolutePath.lastIndexOf("cloud") + 6;
-  return absolutePath.slice(start);
+  const match = absolutePath.match(/cloud[\/\\]\d+/)[0];
+  const index = absolutePath.indexOf(match);
+  return absolutePath.slice(match.length + index);
 }
