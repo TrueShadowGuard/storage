@@ -10,10 +10,9 @@ var dirToJson = function (dir, done) {
       return done(err);
 
     var pending = list.length;
-    list.sort();
 
     if (!pending)
-      return done(null, results);
+      return done(null, results.sort(sortByTypeAndName));
 
     list.forEach(function (file) {
       file = path.resolve(dir, file);
@@ -27,7 +26,7 @@ var dirToJson = function (dir, done) {
               children: res
             });
             if (!--pending)
-              done(null, results);
+              done(null, results.sort(sortByTypeAndName));
           });
         } else {
           const fileInfo = {};
@@ -41,7 +40,7 @@ var dirToJson = function (dir, done) {
             fileInfo
           });
           if (!--pending)
-            done(null, results);
+            done(null, results.sort(sortByTypeAndName));
         }
       });
     });
@@ -54,4 +53,12 @@ function getPath(absolutePath) {
   const match = absolutePath.match(/cloud[\/\\]\d+/)[0];
   const index = absolutePath.indexOf(match);
   return absolutePath.slice(match.length + index);
+}
+
+function sortByTypeAndName(o1, o2) {
+  return (
+    o1.type > o2.type ? -1 :
+    o1.type < o2.type ? 1 :
+    o1.name > o2.name ? 1 : -1
+  )
 }

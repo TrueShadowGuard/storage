@@ -14,9 +14,9 @@ authRouter.post("/login", (req, res) => {
   try {
     const {login, password} = req.body;
     const candidate = User.find(obj => obj.login === login);
-    console.log('login', candidate.data, login, password)
+    console.log('login')
     if (!candidate || candidate.data.password !== password) {
-      return res.status(400).end();
+      return res.status(400).json({text: "Login or password is incorrect"});
     }
 
     const token = jwt.sign({login: candidate.data.login}, JWT_SECRET, {expiresIn: "1h"});
@@ -26,6 +26,7 @@ authRouter.post("/login", (req, res) => {
     res.status(200).json({token, userId: candidate.data._id})
   } catch (e) {
     console.error(e);
+    res.status(500).end();
   }
 });
 
@@ -33,9 +34,9 @@ authRouter.post("/register", (req, res) => {
   try {
     const {login, password} = req.body;
     const candidate = User.find(obj => obj.login === login);
-    console.log('candidate', candidate.data)
+    console.log('register')
     if (candidate) {
-      return res.status(400).end();
+      return res.status(400).json({message: "User already exists"});
     }
 
     const id = getNextCounterValue("lastUserId");
@@ -47,10 +48,10 @@ authRouter.post("/register", (req, res) => {
 
     fs.mkdirSync(userCloudPath);
 
-    res.status(200).json({id});
+    res.status(200).json({userId: id});
   } catch (e) {
     console.error(e);
-    res.status(400).end();
+    res.status(500).end();
   }
 });
 

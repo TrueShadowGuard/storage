@@ -1,9 +1,11 @@
 const path = require("path");
 const express = require("express");
 const fs = require("fs").promises;
+
 const bodyParser = require("body-parser");
 const cors = require("cors");
 const cookieParser = require("cookie-parser");
+const allowHeadersInBrowser = require("./middlewares/allowHeadersInBrowser");
 
 const crudRouter = require("./routers/crudRouter");
 const frontRouter = require("./routers/frontRouter");
@@ -15,7 +17,8 @@ const port = process.env.PORT || 80;
 const app = express();
 app.use(bodyParser.json({limit: "50mb"}));
 app.use(cookieParser());
-app.use(cors());
+app.use(cors({origin: "http://localhost:3000", allowedHeaders: ["Authorization"]}));
+app.use(allowHeadersInBrowser("X-File-Name"))
 
 
 app.use(authRouter)
