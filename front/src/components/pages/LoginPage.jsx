@@ -6,7 +6,7 @@ import toRegister from "../../network/toRegister";
 import {useNavigate} from "react-router-dom";
 import {Visibility, VisibilityOff} from "@mui/icons-material";
 
-const Container = styled.div({
+const Container = styled.form({
   margin: "50px auto",
   padding: "8px",
   border: "1px solid #ccc",

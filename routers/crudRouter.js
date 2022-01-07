@@ -16,6 +16,8 @@ crudRouter.get("/:userId/structure", authMiddleware, rolesMiddleware, async (req
   res.json(await getCloudAsJSON(req.params.userId));
 });
 
+const norm = path.normalize;
+
 /**
  * {
  *   type: "file" | "folder",
@@ -81,7 +83,7 @@ crudRouter.post("/:userId/delete-node", authMiddleware, rolesMiddleware, async (
 crudRouter.get("/:userId/download-node",authMiddleware, rolesMiddleware, async (req, res) => {
   try {
     const cloudPath = getCloudPath(req.params.userId);
-    const absolutePath = path.join(cloudPath, req.query.path);
+    const absolutePath = norm(path.join(cloudPath, req.query.path));
     const isFile = (await fs.lstat(absolutePath)).isFile();
     validatePath(absolutePath, cloudPath);
     //Why String()?
@@ -103,9 +105,9 @@ crudRouter.get("/:userId/download-node",authMiddleware, rolesMiddleware, async (
 crudRouter.put("/:userId/rename-node", authMiddleware, rolesMiddleware, async (req, res) => {
   try {
     const cloudPath = getCloudPath(req.params.userId);
-    const oldPath = path.join(cloudPath, req.body.path);
+    const oldPath = norm(path.join(cloudPath, req.body.path));
     validatePath(oldPath, cloudPath);
-    const newPath = path.join(cloudPath, req.body.path, '..', req.body.name);
+    const newPath = norm(path.join(cloudPath, req.body.path, '..', req.body.name));
     validatePath(newPath, cloudPath);
     await fs.rename(oldPath, newPath);
     res.status(200).end();

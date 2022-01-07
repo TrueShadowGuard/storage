@@ -17,13 +17,10 @@ import {useParams} from "react-router-dom";
 
 const Node = (props) => {
 
-  const type = props.type;
-  const name = props.name;
-  const path = props.path;
-  const children = props.children;
+  const {type, name, path, children} = props.node;
 
-  const {selectedNodes, setSelectedNodes} = useContext(SelectedNodesContext);
-  const isSelected = selectedNodes[path];
+  const {selectedNode, setSelectedNode} = useContext(SelectedNodesContext);
+  const isSelected = selectedNode.path === path;
 
   const {updateFileStructure} = useContext(FileStructureContext)
 
@@ -35,10 +32,14 @@ const Node = (props) => {
 
   const className = getClassName(s, isSelected);
 
-  const contextMenuButtons = [
+  const contextMenuButtons = type === "folder" ? [
     {action: handleDownloadClick(path, params.userId), title: "Download"},
     {action: handleCreateFileClick(path, params.userId), title: "Create file"},
     {action: handleCreateFolderClick(path, params.userId), title: "Create folder"},
+    {action: handleDeleteClick(path, params.userId), title: "Delete"},
+    {action: handleRenameClick(path, params.userId), title: "Rename"},
+  ] : [
+    {action: handleDownloadClick(path, params.userId), title: "Download"},
     {action: handleDeleteClick(path, params.userId), title: "Delete"},
     {action: handleRenameClick(path, params.userId), title: "Rename"},
   ]
@@ -47,22 +48,22 @@ const Node = (props) => {
     <div className={className}>
       {type === "file" ?
         <FileNode name={name}
-                  onClick={handleNodeClick(path)}
-                  onContextMenu={handleRightClick(path, show)}
+                  onClick={handleNodeClick(props.node)}
+                  onContextMenu={handleRightClick(props.node, show)}
         /> :
         <DirectoryNode name={name}
                        children={children}
-                       onClick={handleNodeClick(path)}
-                       onContextMenu={handleRightClick(path, show)}
+                       onClick={handleNodeClick(props.node)}
+                       onContextMenu={handleRightClick(props.node, show)}
         />
       }
       <ContextMenu buttons={contextMenuButtons} id={path} />
     </div>
   );
 
-  function handleNodeClick(path) {
+  function handleNodeClick(node) {
     return function (e) {
-      setSelectedNodes({[path]: true});
+      setSelectedNode(node);
     }
   }
 
@@ -100,10 +101,10 @@ const Node = (props) => {
     }
   }
 
-  function handleRightClick(path, show) {
+  function handleRightClick(node, show) {
     return function (e) {
       show(e);
-      setSelectedNodes({[path]: true});
+      setSelectedNode(node);
     }
   }
 
