@@ -5,6 +5,7 @@ import TitleBar from "../TitleBar/TitleBar";
 
 import "../../styles/main.css"
 import {useNavigate, useParams} from "react-router-dom";
+import DetailedNode from "../DetailedNode/DetailedNode";
 
 export const SelectedNodesContext = createContext({});
 export const FileStructureContext = createContext(null);
@@ -21,15 +22,15 @@ function MainPage() {
 
   useEffect(updateFileStructure, []);
 
-  const [selectedNodes, setSelectedNodes] = useState([]);
+  const [selectedNode, setSelectedNode] = useState([]);
 
   window._navigate = useNavigate();
 
   return (
     <FileStructureContext.Provider value={{updateFileStructure}}>
-      <SelectedNodesContext.Provider value={{selectedNodes, setSelectedNodes}}>
+      <SelectedNodesContext.Provider value={{selectedNode, setSelectedNode}}>
         <TitleBar/>
-        <FileStructure fileStructure={fileStructure}/>
+        <FileStructure fileStructure={fileStructure} detailedNode={selectedNode}/>
       </SelectedNodesContext.Provider>
     </FileStructureContext.Provider>
   );

@@ -29,15 +29,11 @@ var dirToJson = function (dir, done) {
               done(null, results.sort(sortByTypeAndName));
           });
         } else {
-          const fileInfo = {};
-          const stats = fs.statSync(file);
-          fileInfo.size = stats.size;
-          fileInfo.extension = stats.extname;
           results.push({
             type: 'file',
             path: getPath(file),
             name: path.basename(file),
-            fileInfo
+            fileInfo: stat
           });
           if (!--pending)
             done(null, results.sort(sortByTypeAndName));

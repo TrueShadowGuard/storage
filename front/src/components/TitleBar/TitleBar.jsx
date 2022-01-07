@@ -10,7 +10,8 @@ import {red} from "@mui/material/colors";
 
 const TitleBarStyled = styled.div({
   padding: "5px",
-  borderBottom: "1px solid gray"
+  borderBottom: "1px solid gray",
+  display: "flex"
 });
 
 const TitleBar = () => {
@@ -31,7 +32,7 @@ const TitleBar = () => {
           <DownloadRounded/>
         </IconButton>
       </Tooltip>
-      <Tooltip title="Logout">
+      <Tooltip title="Logout" sx={{ml: "auto"}}>
         <IconButton onClick={() => logout()}>
           <Logout sx={{color: red[600]}}/>
         </IconButton>
