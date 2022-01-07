@@ -1,8 +1,8 @@
 import axios from "./axios";
 
-export default async function renameNode(path, name) {
+export default async function renameNode(path, name, userId) {
   try {
-    const response = await axios.put('/rename-node', {path, name});
+    const response = await axios.put(`/user/${userId}/rename-node`, {path, name});
     return true;
   } catch (e) {
     console.error(e);

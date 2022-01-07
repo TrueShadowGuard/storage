@@ -1,8 +1,6 @@
 const express = require('express');
 const jwt = require('jsonwebtoken');
-const db = require("../db/db");
 const User = require("../db/collections/UserCollection");
-const Counter = require("../db/collections/CounterCollection");
 const getNextCounterValue = require("../db/counters");
 const path = require("path");
 const fs = require("fs");
@@ -36,7 +34,7 @@ authRouter.post("/register", (req, res) => {
     const candidate = User.find(obj => obj.login === login);
     console.log('register')
     if (candidate) {
-      return res.status(400).json({message: "User already exists"});
+      return res.status(400).json({text: "User already exists"});
     }
 
     const id = getNextCounterValue("lastUserId");
@@ -44,11 +42,9 @@ authRouter.post("/register", (req, res) => {
 
     const userCloudPath = path.join(__dirname, "..", "cloud", String(id));
 
-    console.log('userCloudPath', userCloudPath);
-
     fs.mkdirSync(userCloudPath);
 
-    res.status(200).json({userId: id});
+    res.status(200).json({userId: id, text: "Successfully registered"});
   } catch (e) {
     console.error(e);
     res.status(500).end();

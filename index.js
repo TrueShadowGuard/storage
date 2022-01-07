@@ -1,6 +1,4 @@
-const path = require("path");
 const express = require("express");
-const fs = require("fs").promises;
 
 const bodyParser = require("body-parser");
 const cors = require("cors");
@@ -17,7 +15,7 @@ const port = process.env.PORT || 80;
 const app = express();
 app.use(bodyParser.json({limit: "50mb"}));
 app.use(cookieParser());
-app.use(cors({origin: "http://localhost:3000", allowedHeaders: ["Authorization"]}));
+app.use(cors());
 app.use(allowHeadersInBrowser("X-File-Name"))
 
 

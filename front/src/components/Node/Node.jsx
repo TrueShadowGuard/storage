@@ -2,7 +2,7 @@ import React, {useContext} from 'react';
 import DirectoryNode from "./DirectoryNode";
 import FileNode from "./FileNode";
 import s from "../../styles/node.module.css";
-import {FileStructureContext, SelectedNodesContext} from "../../App";
+import {FileStructureContext, SelectedNodesContext} from "../pages/MainPage";
 import {useContextMenu} from "react-contexify";
 import deleteNode from "../../network/deleteNode";
 import downloadNode from "../../network/downloadNode";
@@ -13,6 +13,7 @@ import ContextMenu from "./ContextMenu";
 import renameNode from "../../network/renameNode";
 
 import 'react-contexify/dist/ReactContexify.css';
+import {useParams} from "react-router-dom";
 
 const Node = (props) => {
 
@@ -30,14 +31,16 @@ const Node = (props) => {
     id: path
   });
 
+  const params = useParams();
+
   const className = getClassName(s, isSelected);
 
   const contextMenuButtons = [
-    {action: handleDownloadClick(path), title: "Download"},
-    {action: handleCreateFileClick(path), title: "Create file"},
-    {action: handleCreateFolderClick(path), title: "Create folder"},
-    {action: handleDeleteClick(path), title: "Delete"},
-    {action: handleRenameClick(path), title: "Rename"},
+    {action: handleDownloadClick(path, params.userId), title: "Download"},
+    {action: handleCreateFileClick(path, params.userId), title: "Create file"},
+    {action: handleCreateFolderClick(path, params.userId), title: "Create folder"},
+    {action: handleDeleteClick(path, params.userId), title: "Delete"},
+    {action: handleRenameClick(path, params.userId), title: "Rename"},
   ]
 
   return (
@@ -63,20 +66,20 @@ const Node = (props) => {
     }
   }
 
-  function handleDeleteClick(path) {
+  function handleDeleteClick(path, userId) {
     return async function (e) {
-      const ok = await deleteNode(path);
+      const ok = await deleteNode(path, userId);
       if (ok) updateFileStructure();
     }
   }
 
-  function handleDownloadClick(path) {
+  function handleDownloadClick(path, userId) {
     return function (e) {
-      downloadNode(path);
+      downloadNode(path, userId);
     }
   }
 
-  function handleCreateFileClick(path) {
+  function handleCreateFileClick(path, userId) {
     return () => {
       const inp = document.createElement('input');
       inp.type = "file";
@@ -84,15 +87,15 @@ const Node = (props) => {
       inp.onchange = async e => {
         const file = e.target.files[0];
         const text = await readAsText(file);
-        const ok = await createFile(path, text, file.name);
+        const ok = await createFile(path, text, file.name, userId);
         if (ok) updateFileStructure();
       }
     }
   }
 
-  function handleCreateFolderClick(path) {
+  function handleCreateFolderClick(path, userId) {
     return async function (e) {
-      const ok = await createFolder(path);
+      const ok = await createFolder(path, userId);
       if (ok) updateFileStructure();
     }
   }
@@ -104,11 +107,11 @@ const Node = (props) => {
     }
   }
 
-  function handleRenameClick(path) {
+  function handleRenameClick(path, userId) {
      return async function (e) {
        const name = window.prompt("Enter new file name");
        if(name === null) return;
-       const ok = await renameNode(path, name);
+       const ok = await renameNode(path, name, userId);
        if(ok) updateFileStructure();
      }
   }

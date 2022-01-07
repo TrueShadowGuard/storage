@@ -1,8 +1,8 @@
 import axios from './axios';
 
-export default async function getFileStructure() {
+export default async function getFileStructure(userId) {
   try {
-    const response = await axios.get("/structure")
+    const response = await axios.get(`/user/${userId}/structure`)
     return response.data;
   } catch (e) {
     console.error(e);

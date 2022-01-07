@@ -1,8 +1,8 @@
 import axios from "./axios";
 
-export default async function deleteNode(path) {
+export default async function deleteNode(path, userId) {
   try {
-    const response = await axios.post('/delete-node', {path});
+    const response = await axios.post(`/user/${userId}/delete-node`, {path});
     return true;
   } catch (e) {
     console.error(e);
