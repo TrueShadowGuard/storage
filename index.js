@@ -24,3 +24,5 @@ app.use("/user", crudRouter);
 app.use(frontRouter);
 
 app.listen(port, () => console.log("listening on port " + port));
+
+console.log(__dirname)
