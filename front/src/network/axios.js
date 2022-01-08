@@ -1,8 +1,8 @@
 import a from "axios";
 
-const axios = a.create({
-  baseURL: "http://localhost"
-});
+const axiosConfig = {};
+if(process.env.NODE_ENV === 'development') axiosConfig.baseUrl = "http://localhost";
+const axios = a.create(axiosConfig);
 
 axios.interceptors.request.use(config => {
   config.headers.Authorization = localStorage.getItem("token");
